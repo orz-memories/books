@@ -73,7 +73,7 @@
 用户输入不仅仅在于 $_GET 和 $_POST, 包括HTTP Header, Cookie, 文件都是用户输入。
 
 [1]: PHP Data Object, PHP的新式数据库访问接口, 后文会讲解.  
-更多SQL注入的例子参见: http://php.net/manual/zh/security.database.sql-injection.php
+更多SQL注入的例子参见: http://www.php.net/manual/zh/security.database.sql-injection.php
 
 ## Shell 注入
 如有如下代码：
@@ -210,7 +210,7 @@ Cross-site request forgery, 跨域请求伪造。
 那么如果用户访问了这个页面，它在 xxoo.xo 网站就会被注销登录，无论当前站点是不是 xxoo.xo ！  
 这样攻击是非常隐蔽的，因为如果图片加载失败了也只不过是一个小叉而已，还可以通过 CSS 隐藏起来。
 
-上面的例子也许可以认为是无害，因为被注销登录也算不得什么大不了的事情，但如果你继续使用 GET 方式响应非修改性的请求的话，事情就没那么简单了。
+上面的例子也许可以认为是无害，因为被注销登录也算不得什么大不了的事情，但如果你继续使用 GET 方式响应修改性的请求的话，事情就没那么简单了。
 
 记住： **所有修改性的操作都使用POST方式**。
 
