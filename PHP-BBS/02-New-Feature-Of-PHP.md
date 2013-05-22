@@ -8,11 +8,8 @@
 [2]: http://w3techs.com/technologies/details/pl-php/5/all
 
 ## PHP5.2以前
-(    -2006)  
+(XXOO-2006)  
 顺便介绍一下 PHP5.2 已经出现但值得介绍的特征。
-
-## Short Open Tag
-
 
 ## autoload
 大家可能都知道 __autoload() 函数，如果定义了该函数，那么当在代码中使用一个未定义的类的时候，该函数就会被调用，你可以在该函数中加载相应的类实现文件，如：
@@ -29,9 +26,9 @@
         require_once("{$classname}.php")
     });
 
-spl_autoload_register() 会将一个函数注册到 autoload 函数列表中，当出现未定义的类的时候，SPL[3] 会按照注册的倒序逐个调用被注册的 autoload 函数，这意味着你可以使用 spl_autoload_register() 注册多个 autoload 函数.
+spl_autoload_register() 会将一个函数注册到 autoload 函数列表中，当出现未定义的类的时候，SPL[4] 会按照注册的倒序逐个调用被注册的 autoload 函数，这意味着你可以使用 spl_autoload_register() 注册多个 autoload 函数.
 
-[3]: Standard PHP Library, 标准 PHP 库, 被设计用来解决一些经典问题(如数据结构).
+[4]: Standard PHP Library, 标准 PHP 库, 被设计用来解决一些经典问题(如数据结构).
 
 ## PDO 和 MySQLi
 即 PHP Data Object, PHP 数据对象，这是 PHP 的新式数据库访问接口。
@@ -86,9 +83,11 @@ PDO 是官方推荐的，更为通用的数据库访问方式，如果你没有�
 但如果你需要使用 MySQL 所特有的高级功能，那么你可能需要尝试一下 MySQLi, 因为 PDO 为了能够同时在多种数据库上使用，不会包含那些 MySQL 独有的功能。
 
 MySQLi 是 MySQL 的增强接口，同时提供面向过程和面向对象接口，也是目前推荐的 MySQL 驱动，旧的C风格 MySQL 接口将会在今后被默认关闭。  
-MySQLi 的用法和以上两段代码相比，没有太多新概念，在此不再给出示例，可以参见 PHP 官网文档[4]。
+MySQLi 的用法和以上两段代码相比，没有太多新概念，在此不再给出示例，可以参见 PHP 官网文档[5]。
 
-[4]: http://www.php.net/manual/en/mysqli.quickstart.php
+[5]: http://www.php.net/manual/en/mysqli.quickstart.php
+
+### 类型约束
 
 ## PHP5.2
 (2006-2011)
@@ -133,9 +132,9 @@ PHP5.3 算是一个非常大的更新，新增了大量新特征，同时也做�
 * magic_quotes_gpc
 * safe_mode
 
-弃用的原因和解决方案已在第一章说明过[5], 在此不再复述。
+弃用的原因和解决方案已在第一章说明过[6], 在此不再复述。
 
-[5]: 分别在“关注官方通告”和“最小权限原则”。
+[6]: 分别在“关注官方通告”和“最小权限原则”。
 
 ### 匿名函数
 也叫闭包(Closures), 经常被用来临时性地创建一个无名函数，用于回调函数等用途。  
@@ -217,7 +216,7 @@ PHP的命名空间有着前无古人后无来者的无比蛋疼的语法：
         use \XXOO\Test\A as ClassA
     }
 
-更多有关命名空间的语法介绍请参见官网[4].
+更多有关命名空间的语法介绍请参见官网[7].
 
 命名空间时常和 autoload 一同使用，用于自动加载类实现文件：
 
@@ -230,14 +229,206 @@ PHP的命名空间有着前无古人后无来者的无比蛋疼的语法：
 当你实例化一个类 \XXOO\Test\A 的时候，这个类的完整限定名会被传递给 autoload 函数，autoload 函数将类名中的命名空间分隔符(反斜杠)替换为斜杠，并包含对应文件。  
 这样可以实现类定义文件分级储存，按需自动加载。
 
-[4]: http://www.php.net/manual/zh/language.namespaces.php
+[7]: http://www.php.net/manual/zh/language.namespaces.php
 
 ### 后期静态绑定
+PHP 的 OPP 机制，具有继承和类似虚函数的功能，例如如下的代码：
 
-### Heredoc 和 nowdoc
+    class A
+    {
+        public function callFuncXXOO()
+        {
+            print $this->funcXXOO();
+        }
 
-### 用 const 声明常量
+        public function funcXXOO()
+        {
+            return "A::funcXXOO()";
+        }
+    }
+
+    class B extends A
+    {
+        public function funcXXOO()
+        {
+            return "B::funcXXOO";
+        }
+    }
+
+    $b = new B;
+    $b->callFuncXXOO();
+
+输出是：
+
+    B::funcXXOO
+
+可以看到，当在 A 中使用 `$this->funcXXOO()` 时，体现了“虚函数”的机制，实际调用的是 `B::funcXXOO()`.  
+然而如果将所有函数都改为静态函数：
+
+    class A
+    {
+        static public function callFuncXXOO()
+        {
+            print self::funcXXOO();
+        }
+
+        static public function funcXXOO()
+        {
+            return "A::funcXXOO()";
+        }
+    }
+
+    class B extends A
+    {
+        static public function funcXXOO()
+        {
+            return "B::funcXXOO";
+        }
+    }
+
+    $b = new B;
+    $b->callFuncXXOO();
+
+情况就没这么乐观了，输出是：
+
+    A::funcXXOO()
+
+这是因为 self 的语义本来就是“当前类”，所以 PHP5.3 给 static 关键字赋予了一个新功能：后期静态绑定：
+
+    class A
+    {
+        static public function callFuncXXOO()
+        {
+            print static::funcXXOO();
+        }
+
+        // ...
+    }
+
+    // ...
+
+这样就会像预期一样输出了：
+
+    B::funcXXOO
+
+### Heredoc 和 Nowdoc
+PHP5.3 对 Heredoc 以及 Nowdoc 进行了一些改进，它们都用于在 PHP 代码中嵌入大段字符串。
+
+Heredoc 的行为类似于一个双引号字符串：
+
+    $name = "MyName";
+    echo <<< TEXT
+    My name is "{$name}".
+    TEXT;
+
+Heredoc 以三个左尖括号开始，后面跟一个标识符(TEXT), 直到一个同样的顶格的标识符(不能缩进)结束。  
+就像双引号字符串一样，其中可以嵌入变量。
+
+Heredoc 还可以用于函数参数，以及类成员初始化：
+
+    var_dump(<<<EOD
+    Hello World
+    EOD
+    );
+
+    class A
+    {
+        const xx = <<< EOD
+    Hello World
+    EOD;
+
+        public $oo = <<< EOD
+    Hello World
+    EOD;
+    }
+
+Nowdoc 的行为像一个单引号字符串，不能在其中嵌入变量，和 Heredoc 唯一的区别就是，三个左尖括号后的标识符要以单引号括起来：
+
+    $name = "MyName";
+    echo <<< 'TEXT'
+    My name is "{$name}".
+    TEXT;
+
+输出：
+
+    My name is "{$name}".
+
+### 用 const 定义常量
+PHP5.3 起同时支持在全局命名空间和类中使用 const 定义常量。
+
+旧式风格：
+
+    define("XOOO", "Value");
+
+新式风格：
+
+    const XXOO = "Value";
 
 ### 三元运算符简写形式
+旧式风格：
+
+    echo $a ? $a : "No Value";
+
+可简写成：
+
+    echo $a ?: "No Value";
+
+即如果省略三元运算符的第二个部分，会默认用第一个部分代替。
 
 ### Phar
+Phar即PHP Archive, 起初只是Pear中的一个库而已，后来在PHP5.3被重新编写成C扩展并内置到 PHP 中。  
+Phar用来将多个 .php 脚本打包(也可以打包其他文件)成一个 .phar 的压缩文件(通常是ZIP格式)。  
+目的在于模仿 Java 的 .jar, 不对，目的是为了让发布PHP应用程序更加方便。同时还提供了数字签名验证等功能。
+
+.phar 文件可以像 .php 文件一样，被PHP引擎解释执行，同时你还可以写出这样的代码来包含(require) .phar 中的代码：
+
+    require("xxoo.phar");
+    require("phar://xxoo.phar/xo/ox.php");
+
+更多信息请参见官网[8].
+
+[8]: http://us3.php.net/manual/zh/phar.using.intro.php
+
+## PHP5.4
+(2012-2013)
+
+## Short Open Tag
+Short Open Tag 自 PHP5.4 起总是可用。  
+在这里集中讲一下有关 PHP 起止标签的问题。即：
+
+    <?php
+    // Code...
+    ?>
+
+通常就是上面的形式，除此之外还有一种简写形式：
+
+    <? /* Code... */ ?>
+
+还可以把
+
+    <?php echo $xxoo;?>
+
+简写成：
+
+    <?= $xxoo;?>
+
+这种简写形式被称为 Short Open Tag, 在 PHP5.3 起被默认开启，在 PHP5.4 起总是可用。  
+使用这种简写形式在 HTML 中嵌入 PHP 变量将会非常方便。
+
+对于纯 PHP 文件(如类实现文件), PHP 官方建议顶格写起始标记，同时 **省略** 结束标记。  
+这样可以确保整个 PHP 文件都是 PHP 代码，没有任何输出，否则当你包含该文件后，设置 Header 和 Cookie 时会遇到一些麻烦[3].
+
+[3]: Header 和 Cookie 必须在输出任何内容之前被发送。
+
+### 数组简写形式
+### Traits
+### 内置 Web 服务器
+### 多处细节修改
+
+同时，PHP5.3 还新增了动态访问静态方法的方式：
+
+    $func = "funcXXOO";
+    A::{$func}();
+
+
+
