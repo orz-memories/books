@@ -8,7 +8,7 @@
 [2]: http://w3techs.com/technologies/details/pl-php/5/all
 
 ## PHP5.2以前
-(XXOO-2006)  
+(2006前)  
 顺便介绍一下 PHP5.2 已经出现但值得介绍的特征。
 
 ## autoload
@@ -26,9 +26,9 @@
         require_once("{$classname}.php")
     });
 
-spl_autoload_register() 会将一个函数注册到 autoload 函数列表中，当出现未定义的类的时候，SPL[4] 会按照注册的倒序逐个调用被注册的 autoload 函数，这意味着你可以使用 spl_autoload_register() 注册多个 autoload 函数.
+spl_autoload_register() 会将一个函数注册到 autoload 函数列表中，当出现未定义的类的时候，SPL[3] 会按照注册的倒序逐个调用被注册的 autoload 函数，这意味着你可以使用 spl_autoload_register() 注册多个 autoload 函数.
 
-[4]: Standard PHP Library, 标准 PHP 库, 被设计用来解决一些经典问题(如数据结构).
+[3]: Standard PHP Library, 标准 PHP 库, 被设计用来解决一些经典问题(如数据结构).
 
 ## PDO 和 MySQLi
 即 PHP Data Object, PHP 数据对象，这是 PHP 的新式数据库访问接口。
@@ -83,11 +83,18 @@ PDO 是官方推荐的，更为通用的数据库访问方式，如果你没有�
 但如果你需要使用 MySQL 所特有的高级功能，那么你可能需要尝试一下 MySQLi, 因为 PDO 为了能够同时在多种数据库上使用，不会包含那些 MySQL 独有的功能。
 
 MySQLi 是 MySQL 的增强接口，同时提供面向过程和面向对象接口，也是目前推荐的 MySQL 驱动，旧的C风格 MySQL 接口将会在今后被默认关闭。  
-MySQLi 的用法和以上两段代码相比，没有太多新概念，在此不再给出示例，可以参见 PHP 官网文档[5]。
+MySQLi 的用法和以上两段代码相比，没有太多新概念，在此不再给出示例，可以参见 PHP 官网文档[4]。
 
-[5]: http://www.php.net/manual/en/mysqli.quickstart.php
+[4]: http://www.php.net/manual/en/mysqli.quickstart.php
 
 ### 类型约束
+通过类型约束可以限制参数的类型，不过这一机制并不完善，目前仅适用于类和 callable(可执行类型) 以及 array(数组), 不适用于 string 和 int.
+
+    // 限制第一个参数为 MyClass, 第二个参数为可执行类型，第三个参数为数组
+    function MyFunction(MyClass $a, callable $b, array $c)
+    {
+        // ...
+    }
 
 ## PHP5.2
 (2006-2011)
@@ -132,9 +139,9 @@ PHP5.3 算是一个非常大的更新，新增了大量新特征，同时也做�
 * magic_quotes_gpc
 * safe_mode
 
-弃用的原因和解决方案已在第一章说明过[6], 在此不再复述。
+弃用的原因和解决方案已在第一章说明过[5], 在此不再复述。
 
-[6]: 分别在“关注官方通告”和“最小权限原则”。
+[5]: 分别在“关注官方通告”和“最小权限原则”。
 
 ### 匿名函数
 也叫闭包(Closures), 经常被用来临时性地创建一个无名函数，用于回调函数等用途。  
@@ -216,7 +223,7 @@ PHP的命名空间有着前无古人后无来者的无比蛋疼的语法：
         use \XXOO\Test\A as ClassA
     }
 
-更多有关命名空间的语法介绍请参见官网[7].
+更多有关命名空间的语法介绍请参见官网[6].
 
 命名空间时常和 autoload 一同使用，用于自动加载类实现文件：
 
@@ -229,7 +236,7 @@ PHP的命名空间有着前无古人后无来者的无比蛋疼的语法：
 当你实例化一个类 \XXOO\Test\A 的时候，这个类的完整限定名会被传递给 autoload 函数，autoload 函数将类名中的命名空间分隔符(反斜杠)替换为斜杠，并包含对应文件。  
 这样可以实现类定义文件分级储存，按需自动加载。
 
-[7]: http://www.php.net/manual/zh/language.namespaces.php
+[6]: http://www.php.net/manual/zh/language.namespaces.php
 
 ### 后期静态绑定
 PHP 的 OPP 机制，具有继承和类似虚函数的功能，例如如下的代码：
@@ -354,7 +361,7 @@ Nowdoc 的行为像一个单引号字符串，不能在其中嵌入变量，和 
     My name is "{$name}".
 
 ### 用 const 定义常量
-PHP5.3 起同时支持在全局命名空间和类中使用 const 定义常量。
+PHP5.3 起同时支持在全局命名空间和类中使用 const 定义常量。  
 
 旧式风格：
 
@@ -363,6 +370,13 @@ PHP5.3 起同时支持在全局命名空间和类中使用 const 定义常量。
 新式风格：
 
     const XXOO = "Value";
+
+const 形式仅适用于常量，不适用于运行时才能求值的表达式：
+
+    // 正确
+    const XXOO = 1234;
+    // 错误
+    const XXOO = 2 * 617;
 
 ### 三元运算符简写形式
 旧式风格：
@@ -385,9 +399,9 @@ Phar用来将多个 .php 脚本打包(也可以打包其他文件)成一个 .pha
     require("xxoo.phar");
     require("phar://xxoo.phar/xo/ox.php");
 
-更多信息请参见官网[8].
+更多信息请参见官网[7].
 
-[8]: http://us3.php.net/manual/zh/phar.using.intro.php
+[7]: http://www.php.net/manual/zh/phar.using.intro.php
 
 ## PHP5.4
 (2012-2013)
@@ -416,19 +430,120 @@ Short Open Tag 自 PHP5.4 起总是可用。
 使用这种简写形式在 HTML 中嵌入 PHP 变量将会非常方便。
 
 对于纯 PHP 文件(如类实现文件), PHP 官方建议顶格写起始标记，同时 **省略** 结束标记。  
-这样可以确保整个 PHP 文件都是 PHP 代码，没有任何输出，否则当你包含该文件后，设置 Header 和 Cookie 时会遇到一些麻烦[3].
+这样可以确保整个 PHP 文件都是 PHP 代码，没有任何输出，否则当你包含该文件后，设置 Header 和 Cookie 时会遇到一些麻烦[8].
 
-[3]: Header 和 Cookie 必须在输出任何内容之前被发送。
+[8]: Header 和 Cookie 必须在输出任何内容之前被发送。
 
 ### 数组简写形式
+这是非常方便的一项特征！
+
+    // 原来的数组写法
+    $arr = array("key" => "value", "key2" => "value2");
+    // 简写形式
+    $arr = ["key" => "value", "key2" => "value2"];
+
 ### Traits
+所谓Traits就是“构件”，是用来替代继承的一种机制。PHP中无法进行多重继承，但一个类可以包含多个Traits.
+
+    // Traits不能被单独实例化，只能被类所包含
+    trait SayWorld
+    {
+        public function sayHello()
+        {
+            echo 'World!';
+        }
+    }
+
+    class MyHelloWorld
+    {
+        // 将SayWorld中的成员包含进来
+        use SayWorld;
+    }
+
+    $xxoo = new MyHelloWorld();
+    // sayHello() 函数是来自 SayWorld 构件的
+    $xxoo->sayHello();
+
+Traits还有很多神奇的功能，比如包含多个Traits, 解决冲突，修改访问权限，为函数设置别名等等。  
+Traits中也同样可以包含Traits. 篇幅有限不能逐个举例，详情参见官网[9].
+
+[9]: http://www.php.net/manual/zh/language.oop5.traits.php
+
+
 ### 内置 Web 服务器
+PHP从5.4开始内置一个轻量级的Web服务器，不支持并发，定位是用于开发和调试环境。
+
+在开发环境使用它的确非常方便。
+
+    php -S localhost:8000
+
+这样就在当前目录建立起了一个Web服务器，你可以通过 http://localhost:8000/ 来访问。  
+其中localhost是监听的ip，8000是监听的端口，可以自行修改。
+
+很多应用中，都会进行URL重写，所以PHP提供了一个设置路由脚本的功能:
+
+    php -S localhost:8000 index.php
+
+这样一来，所有的请求都会由index.php来处理。
+
+你还可以使用 XDebug 来进行断点调试。
+
 ### 多处细节修改
 
-同时，PHP5.3 还新增了动态访问静态方法的方式：
+PHP5.4 新增了动态访问静态方法的方式：
 
     $func = "funcXXOO";
     A::{$func}();
+
+新增在实例化时访问类成员的特征：
+
+    (new MyClass)->xxoo();
+
+新增支持对函数返回数组的成员访问解析(这种写法在之前版本是会报错的)：
+
+    print func()[0];
+
+## PHP5.5
+(2013起)
+
+### yield
+yield关键字用于当函数需要返回一个迭代器的时候, 逐个返回值。
+
+    function number10()
+    {
+        for($i = 1; $i <= 10; $i += 1)
+            yield $i;
+    }
+
+该函数的返回值是一个数组：
+
+    [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+### list() 用于 foreach
+可以用 list() 在 foreach 中解析嵌套的数组：
+
+    $array = [
+        [1, 2, 3],
+        [4, 5, 6],
+    ];
+
+    foreach ($array as list($a, $b, $c))
+        echo "{$a} {$b} {$c}\n";
+
+结果：
+
+    1 2 3
+    4 5 6
+
+### 多处细节修改
+不推荐使用 mysql 函数，推荐使用 PDO或MySQLi, 参见前文。  
+不再支持Windows XP.
+
+可用 `MyClass::class` 取到一个类的完整限定名(包括命名空间)。
+
+empty() 支持表达式作为参数。
+
+try-catch 结构新增 finally 块。
 
 
 
