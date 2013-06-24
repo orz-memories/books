@@ -141,13 +141,30 @@ PHP5.3 算是一个非常大的更新，新增了大量新特征，同时也做�
 ### 弃用的功能
 以下几个功能被弃用，若在配置文件中启用，则 PHP 会在运行时发出警告。
 
-* register_globals
-* magic_quotes_gpc
-* safe_mode
+#### Register Globals
+这是 php.ini 中的一个选项(register_globals), 开启后会将所有表单变量($_GET和$_POST)注册为全局变量.  
+看下面的例子：
 
-弃用的原因和解决方案已在第一章说明过[5], 在此不再复述。
+    if(isAuth())
+        $authorized = true;
+    if($authorized)
+        include("page.php");
 
-[5]: 分别在“关注官方通告”和“最小权限原则”。
+这段代码在通过验证时，将 $authorized 设置为 true. 然后根据 $authorized 的值来决定是否显示页面.
+
+但由于并没有事先把 $authorized 初始化为 false, 当 register_globals 打开时，可能访问 /auth.php?authorized=1 来定义该变量值，绕过身份验证。
+
+该特征属于历史遗留问题，在 PHP4.2 中被默认关闭，在 PHP5.4 中被移除。
+
+#### Magic Quotes
+对应 php.ini 中的选项 magic_quotes_gpc, 这个特征同样属于历史遗留问题，已经在 PHP5.4 中移除。
+
+该特征会将所有用户输入进行转义，这看上去不错，在第一章我们提到过要对用户输入进行转义。  
+但是 PHP 并不知道哪些输入会进入 SQL , 哪些输入会进入 Shell, 哪些输入会被显示为 HTML, 所以很多时候这种转义会引起混乱。
+
+#### Safe Mode
+很多虚拟主机提供商使用 Safe Mode 来隔离多个用户，但 Safe Mode 存在诸多问题，例如某些扩展并不按照 Safe Mode 来进行权限控制。  
+PHP官方推荐使用操作系统的机制来进行权限隔离，让Web服务器以不同的用户权限来运行PHP解释器，请参见第一章中的`最小权限原则`.
 
 ### 匿名函数
 也叫闭包(Closures), 经常被用来临时性地创建一个无名函数，用于回调函数等用途。  
@@ -229,7 +246,7 @@ PHP的命名空间有着前无古人后无来者的无比蛋疼的语法：
         use \XXOO\Test\A as ClassA
     }
 
-更多有关命名空间的语法介绍请参见官网[6].
+更多有关命名空间的语法介绍请参见官网[5].
 
 命名空间时常和 autoload 一同使用，用于自动加载类实现文件：
 
@@ -242,7 +259,7 @@ PHP的命名空间有着前无古人后无来者的无比蛋疼的语法：
 当你实例化一个类 \XXOO\Test\A 的时候，这个类的完整限定名会被传递给 autoload 函数，autoload 函数将类名中的命名空间分隔符(反斜杠)替换为斜杠，并包含对应文件。  
 这样可以实现类定义文件分级储存，按需自动加载。
 
-[6]: http://www.php.net/manual/zh/language.namespaces.php
+[5]: http://www.php.net/manual/zh/language.namespaces.php
 
 ### 后期静态绑定
 PHP 的 OPP 机制，具有继承和类似虚函数的功能，例如如下的代码：
@@ -405,9 +422,9 @@ Phar用来将多个 .php 脚本打包(也可以打包其他文件)成一个 .pha
     require("xxoo.phar");
     require("phar://xxoo.phar/xo/ox.php");
 
-更多信息请参见官网[7].
+更多信息请参见官网[6].
 
-[7]: http://www.php.net/manual/zh/phar.using.intro.php
+[6]: http://www.php.net/manual/zh/phar.using.intro.php
 
 ## PHP5.4
 (2012-2013)
@@ -436,9 +453,9 @@ Short Open Tag 自 PHP5.4 起总是可用。
 使用这种简写形式在 HTML 中嵌入 PHP 变量将会非常方便。
 
 对于纯 PHP 文件(如类实现文件), PHP 官方建议顶格写起始标记，同时 **省略** 结束标记。  
-这样可以确保整个 PHP 文件都是 PHP 代码，没有任何输出，否则当你包含该文件后，设置 Header 和 Cookie 时会遇到一些麻烦[8].
+这样可以确保整个 PHP 文件都是 PHP 代码，没有任何输出，否则当你包含该文件后，设置 Header 和 Cookie 时会遇到一些麻烦[7].
 
-[8]: Header 和 Cookie 必须在输出任何内容之前被发送。
+[7]: Header 和 Cookie 必须在输出任何内容之前被发送。
 
 ### 数组简写形式
 这是非常方便的一项特征！
@@ -471,9 +488,9 @@ Short Open Tag 自 PHP5.4 起总是可用。
     $xxoo->sayHello();
 
 Traits还有很多神奇的功能，比如包含多个Traits, 解决冲突，修改访问权限，为函数设置别名等等。  
-Traits中也同样可以包含Traits. 篇幅有限不能逐个举例，详情参见官网[9].
+Traits中也同样可以包含Traits. 篇幅有限不能逐个举例，详情参见官网[8].
 
-[9]: http://www.php.net/manual/zh/language.oop5.traits.php
+[8]: http://www.php.net/manual/zh/language.oop5.traits.php
 
 
 ### 内置 Web 服务器
@@ -494,7 +511,7 @@ PHP从5.4开始内置一个轻量级的Web服务器，不支持并发，定位�
 
 你还可以使用 XDebug 来进行断点调试。
 
-### 多处细节修改
+### 细节修改
 
 PHP5.4 新增了动态访问静态方法的方式：
 
@@ -541,8 +558,8 @@ yield关键字用于当函数需要返回一个迭代器的时候, 逐个返回�
     1 2 3
     4 5 6
 
-### 多处细节修改
-不推荐使用 mysql 函数，推荐使用 PDO或MySQLi, 参见前文。  
+### 细节修改
+不推荐使用 mysql 函数，推荐使用 PDO 或 MySQLi, 参见前文。  
 不再支持Windows XP.
 
 可用 `MyClass::class` 取到一个类的完整限定名(包括命名空间)。

@@ -225,29 +225,6 @@ Cross-site request forgery, 跨域请求伪造。
 * 使用官方的稳定发行版
 * 及时关注官方通告，安装补丁
 
-在PHP领域，有很多问题是官方在反复提醒，但仍广泛存在的，我们在此指出几点：
-
-### 关闭 Register Globals
-这是 php.ini 中的一个选项(register_globals), 开启后会将所有表单变量($_GET和$_POST)注册为全局变量.  
-看下面的例子：
-
-    if(isAuth())
-        $authorized = true;
-    if($authorized)
-        include("page.php");
-
-这段代码在通过验证时，将 $authorized 设置为 true. 然后根据 $authorized 的值来决定是否显示页面.
-
-但由于并没有事先把 $authorized 初始化为 false, 当 register_globals 打开时，可能访问 /auth.php?authorized=1 来定义该变量值，绕过身份验证。
-
-该特征属于历史遗留问题，在 PHP4.2 中被默认关闭，在 PHP5.4 中被移除。
-
-### 关闭 Magic Quotes
-对应 php.ini 中的选项 magic_quotes_gpc, 这个特征同样属于历史遗留问题，已经在 PHP5.4 中移除。
-
-该特征会将所有用户输入进行转义，这看上去不错，我们之前提到过要对用户输入进行转义。  
-但是 PHP 并不知道哪些输入会进入 SQL , 哪些输入会进入 Shell, 哪些输入会被显示为 HTML, 所以很多时候这种转义会引起混乱。
-
 ## 最小权限原则
 让我们试想如果 PHP 出现了一个验证漏洞，导致可以任意执行Shell命令，这将会多么恐怖。事实上这种漏洞在各种服务器软件上时有发生。  
 虽然我们无法阅读和修改 PHP 的源代码，但我们可以通过给予 PHP 最小的权限，来减少漏洞被利用后的损失。
