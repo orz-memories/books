@@ -1,10 +1,16 @@
-# 2.0 PHP 中的新特征
+# 2. PHP 中的新特征
 
 截至目前(2013.5), PHP 的最新稳定版本是 PHP5.4, 但有差不多一半的用户仍在使用已经不在维护[1]的 PHP5.2, 其余的一半用户在使用 PHP5.3[2].  
 因为 PHP 那“集百家之长”的蛋疼语法，加上社区氛围不好，很多人对新版本，新特征并无兴趣。  
 本章将会介绍自 PHP5.2 起，直至 PHP5.5 中增加的新特征，本书后文若不加说明，默认基于目前的最新稳定版本 PHP5.4.
 
-[1]: 已于2011年1月停止支持： http://www.php.net/eol.php
+* PHP5.2以前：autoload, PDO 和 MySQLi, 类型约束
+* PHP5.2：JSON 支持
+* PHP5.3：弃用的功能，匿名函数，新增魔术方法，命名空间，后期静态绑定，Heredoc 和 Nowdoc, const, 三元运算符，Phar
+* PHP5.4：Short Open Tag, 数组简写形式，Traits, 内置 Web 服务器，细节修改
+* PHP5.5：yield, list() 用于 foreach, 细节修改
+
+[1]: 已于2011年1月停止支持： http://www.php.net/eol.php  
 [2]: http://w3techs.com/technologies/details/pl-php/5/all
 
 ## PHP5.2以前
