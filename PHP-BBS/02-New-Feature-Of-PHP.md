@@ -9,6 +9,7 @@
 * PHP5.3：弃用的功能，匿名函数，新增魔术方法，命名空间，后期静态绑定，Heredoc 和 Nowdoc, const, 三元运算符，Phar
 * PHP5.4：Short Open Tag, 数组简写形式，Traits, 内置 Web 服务器，细节修改
 * PHP5.5：yield, list() 用于 foreach, 细节修改
+* PHP5.6: 常量增强，可变函数参数，命名空间增强
 
 注：已于2011年1月停止支持： http://www.php.net/eol.php  
 注：http://w3techs.com/technologies/details/pl-php/5/all
@@ -568,5 +569,53 @@ empty() 支持表达式作为参数。
 
 try-catch 结构新增 finally 块。
 
+## PHP5.6
+### 更好的常量
 
+定义常量时允许使用之前定义的常量进行计算：
 
+    const A = 2;
+    const B = A + 1;
+    
+    class C
+    {
+    	const STR = "hello";
+    	const STR2 = self::STR + ", world";
+    }
+    
+允许常量作为函数参数默认值：
+
+	function func($arg = C::STR2)
+
+### 更好的可变函数参数
+用于代替 `func_get_args()`
+
+	function add(...$args)
+	{
+		$result = 0;
+		foreach($args as $arg)
+		    $result += $arg;
+		return $result;
+	}
+	
+同时可以在调用函数时，把数组展开为函数参数：
+
+	$arr = [2, 3];
+	add(1, ...$arr);
+	// 结果为 6
+	
+### 命名空间
+命名空间支持常量和函数：
+
+	namespace Name\Space {
+        const FOO = 42;
+        function f() { echo __FUNCTION__."\n"; }
+	}
+	
+	namespace {
+	    use const Name\Space\FOO;
+	    use function Name\Space\f;
+	
+	    echo FOO."\n";
+	    f();
+	}
